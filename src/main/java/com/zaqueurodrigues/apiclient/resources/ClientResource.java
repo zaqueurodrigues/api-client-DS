@@ -44,6 +44,11 @@ public class ClientResource {
 		return ResponseEntity.ok().body(service.findById(id));
 	}
 	
+	@GetMapping(value = "/cpf")
+	public ResponseEntity<ClientDTO> findByCpf(@RequestParam(value = "cpf") String cpf){
+		return ResponseEntity.ok().body(service.findByCpf(cpf));
+	}
+	
 	@PostMapping
 	public ResponseEntity<ClientDTO> insert(@RequestBody ClientDTO dto){
 		dto = service.insert(dto);

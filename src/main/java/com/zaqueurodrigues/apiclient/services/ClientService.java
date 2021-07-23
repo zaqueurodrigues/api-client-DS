@@ -18,18 +18,29 @@ import com.zaqueurodrigues.apiclient.services.exceptions.ResourceNotFoundExcepti
 
 @Service
 public class ClientService {
-	
+
 	@Autowired
 	private ClientRepository repository;
-	
+
 	@Transactional(readOnly = true)
-	public Page<ClientDTO> findAll(PageRequest pageRequest){
+	public Page<ClientDTO> findAll(PageRequest pageRequest) {
 		return repository.findAll(pageRequest).map(ClientDTO::new);
 	}
-	
+
 	@Transactional(readOnly = true)
 	public ClientDTO findById(Long id) {
-		return repository.findById(id).map(ClientDTO::new).orElseThrow(() -> new ResourceNotFoundException("Client not exists"));
+		return repository.findById(id).map(ClientDTO::new)
+				.orElseThrow(() -> new ResourceNotFoundException("Client not exists"));
+	}
+
+	@Transactional(readOnly = true)
+	public ClientDTO findByCpf(String cpf) {
+		try {
+			Client entity = repository.findByCpf(cpf);
+			return new ClientDTO(entity);
+		} catch (Exception e) {
+			throw new ResourceNotFoundException("CPF not exists: " + cpf);
+		}
 	}
 
 	@Transactional
@@ -39,7 +50,7 @@ public class ClientService {
 		entity = repository.save(entity);
 		return new ClientDTO(entity);
 	}
-	
+
 	@Transactional
 	public ClientDTO update(Long id, ClientDTO dto) {
 		try {
@@ -48,20 +59,20 @@ public class ClientService {
 			entity = repository.save(entity);
 			return new ClientDTO(entity);
 		} catch (EntityNotFoundException e) {
-			throw new ResourceNotFoundException("Id not found: " +id);
-		}	
+			throw new ResourceNotFoundException("Id not found: " + id);
+		}
 	}
-	
+
 	public void delete(Long id) {
 		try {
-			repository.deleteById(id);	
+			repository.deleteById(id);
 		} catch (EmptyResultDataAccessException e) {
-			throw new ResourceNotFoundException("Id not found: " +id);
+			throw new ResourceNotFoundException("Id not found: " + id);
 		} catch (DataIntegrityViolationException e) {
 			throw new DatabaseException("Integrity violation");
 		}
 	}
-	
+
 	private void copyDtoToEntity(ClientDTO dto, Client entity) {
 		entity.setName(dto.getName());
 		entity.setCpf(dto.getCpf());
