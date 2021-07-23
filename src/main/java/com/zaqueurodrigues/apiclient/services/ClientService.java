@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.zaqueurodrigues.apiclient.dto.ClientDTO;
 import com.zaqueurodrigues.apiclient.repositories.ClientRepository;
+import com.zaqueurodrigues.apiclient.services.exceptions.ResourceNotFoundException;
 
 @Service
 public class ClientService {
@@ -18,6 +19,11 @@ public class ClientService {
 	@Transactional(readOnly = true)
 	public Page<ClientDTO> findAll(PageRequest pageRequest){
 		return repository.findAll(pageRequest).map(ClientDTO::new);
+	}
+	
+	@Transactional(readOnly = true)
+	public ClientDTO findById(Long id) {
+		return repository.findById(id).map(ClientDTO::new).orElseThrow(() -> new ResourceNotFoundException("Client not exists"));
 	}
 
 }
